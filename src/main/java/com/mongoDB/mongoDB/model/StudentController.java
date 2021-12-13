@@ -30,40 +30,11 @@ public class StudentController {
 
     @CrossOrigin(origins = "*")
     @GetMapping(path = "/findAllStudents",produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getAllStudents(HttpServletResponse response) {
-       return studentService.getAll(response);
+    public List<Student> getAllStudents(HttpServletResponse response) {
+       return studentService.getAllEmployees();
 
     }
 
-
-    @GetMapping(path = "/findCount/{count}")
-    public List<Student> getStudentsByCount(@PathVariable int count) {
-        return studentService.getAllByCount(count);
-    }
-
-    @GetMapping(path = "/findStudentByAge")
-    public List<Student> getStudentsByAge() {
-        return studentService.findAllBySorting();
-    }
-
-    @GetMapping(path = "/findStudentByNameSorted")
-    public List<Student> getStudentsByName() {
-        return studentService.getByNameSorted();
-    }
-
-
-    @GetMapping(path = "/findStudents/{id}")
-    public String getStudentById(@PathVariable("id") ObjectId id,HttpServletResponse response) throws JsonProcessingException {
-
-        return studentService.getById(id,response);
-    }
-
-
-
-    @GetMapping(path = "/findStudent/{name}")
-    public List<Student> getStudentByName(@PathVariable String name) {
-        return studentService.getByName(name);
-    }
 
 
 
@@ -84,7 +55,7 @@ public class StudentController {
     public String updateStudent(@PathVariable("id") ObjectId id,
                                 @RequestBody Student student, HttpServletResponse response) throws JsonProcessingException {
 
-        return studentService.updateStudent(id, student, response);
+        return studentService.updateEmployee(id, student, response);
     }
 
 

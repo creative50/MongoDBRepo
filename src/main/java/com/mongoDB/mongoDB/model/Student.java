@@ -42,7 +42,7 @@ public class Student {
         this.dob = dob;
     }
 
-    private String name;
+        private String name;
 
 
     private LocalDate dob;
