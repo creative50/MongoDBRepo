@@ -2,9 +2,9 @@ package com.mongoDB.mongoDB;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mongoDB.mongoDB.dao.StudentRepository;
 import com.mongoDB.mongoDB.model.Student;
 import com.mongoDB.mongoDB.model.StudentService;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
@@ -34,6 +34,8 @@ public class StudentControllerTests {
 
     private static StudentService studentService;
 
+    private static StudentRepository studentRepository;
+
 
     @BeforeEach
     public void setupTestSuit() throws JsonProcessingException {
@@ -45,25 +47,17 @@ public class StudentControllerTests {
 
     @Test
     public void testCreateStudent() throws Exception {
-
-        String requestString =  "{" + "\"saveStudentResponse\":{" + "\"dob\":[2000,5,20]," +
-                "\"name\":\"arkam\"," +
-                "\"id\":\"61518085aafda645fc69af74\"," +
-                "\"age\":21}}";
-
         String newString =
                 "{" +
                         "\"name\":\"arkam\"," +
                 "\"dob\" : \"2000-05-20\" " +"}";
-        JSONObject response = new JSONObject(requestString);
 
         this.mockMvc.perform(post(URL_TEMPLATE+"/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(newString))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.saveStudentResponse" ,hasValue(21)));
+                .andExpect(status().isOk());}
 
-    }
+
 
     @Test
     public void postBadRequest() throws Exception {
@@ -82,23 +76,15 @@ public class StudentControllerTests {
     public void testReadStudent() throws Exception{
 
         mockMvc.perform(get(URL_TEMPLATE + "/findAllStudents"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.getAllStudentResponse",hasSize(4)))
-
-        ;
+                .andExpect(status().isOk());
 
     }
 
-    @Test
-    public void getStudentNonExisting() throws Exception {
-        mockMvc.perform(get(URL_TEMPLATE + "/findStudents/{id}", "6140cbdc5a27fa77eabe7ba2"))
-                .andExpect(jsonPath("$.errors").doesNotExist());
-    }
+
 
     @Test
     public void getStudentByName() throws Exception {
-        mockMvc.perform(get(URL_TEMPLATE + "/findStudent/{name}", "arkam"))
+        mockMvc.perform(get(URL_TEMPLATE + "/findAllStudents"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name" ,is("arkam")));
     }
@@ -110,11 +96,33 @@ public class StudentControllerTests {
     }
 
     @Test
+    public void updateStudentSuccess() throws Exception {
+        String requestString = "{" +
+                "\"name\":\"maryam\"," +
+                "\"dob\" : \"2000-05-20\" " +"}";
+        String updatedName = "maryam";
+        mockMvc.perform(put(URL_TEMPLATE + "/students/{id}", "61c334369b66d609659fef9d")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestString));
+        mockMvc.perform(get(URL_TEMPLATE + "/findAllStudents/{id}", "61c334369b66d609659fef9d"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name", is(updatedName)));
+    }
+
+
+    @Test
     public void deleteStudentById() throws Exception {
-        mockMvc.perform(delete(URL_TEMPLATE + "/delete/{id}", "6155c6cdee399717d24e751a"))
+        mockMvc.perform(delete(URL_TEMPLATE + "/delete/{id}", "61c19a86a879c50d44dd967e"))
                 .andExpect(status().isOk());
 
 
+    }
+
+    @Test
+    public void deleteStudentNonExisting() throws Exception {
+        mockMvc.perform(get(URL_TEMPLATE + "/delete/{id}", "61c19a86a879c50d44dd967e"))
+                .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
 

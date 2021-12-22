@@ -20,10 +20,16 @@ public class Student {
     public Student() {
     }
 
-
     private ObjectId id;
+    private String name;
+    private LocalDate dob;
 
+    @Transient
+    private int age;
 
+    public int getAge() {
+        return Period.between(this.dob,LocalDate.now()).getYears();
+    }
 
 
     public String getName() {
@@ -40,23 +46,6 @@ public class Student {
 
     public void setDob(LocalDate dob) {
         this.dob = dob;
-    }
-
-        private String name;
-
-
-    private LocalDate dob;
-
-
-
-    @Transient
-    private int age;
-
-
-
-
-    public int getAge() {
-        return Period.between(this.dob,LocalDate.now()).getYears();
     }
 
     public void setAge(int age) {

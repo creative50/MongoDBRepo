@@ -3,28 +3,21 @@ package com.mongoDB.mongoDB.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongoDB.mongoDB.dao.StudentRepository;
 import org.bson.types.ObjectId;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
+import com.mongoDB.mongoDB.dao.StudentRepository;
 
 
 @Service
 public class StudentService {
 
-    private  StudentRepository studentRepository;
+    private StudentRepository studentRepository;
 
     private Student student;
 
@@ -37,27 +30,39 @@ public class StudentService {
 
     }
 
-    public List<Student> getAllEmployees(){
+    public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
 
 
-    public String save(Student employee,HttpServletResponse response) throws JsonProcessingException, JSONException {
+    public String save(Student student, HttpServletResponse response) throws JsonProcessingException, JSONException {
         JSONObject responseJson = new JSONObject();
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
 
-        if (employee.getName() == null || ("").equals(employee.getAge())) {
+        if (student.getName() == null || ("").equals(student.getAge())) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
-        employee = studentRepository.save(employee);
-        JSONObject studentJSON = new JSONObject(mapper.writeValueAsString(employee));
-        studentJSON.put("id", employee.getId().toHexString());
-        responseJson.put("saveEmployeeResponse", studentJSON);
+        student = studentRepository.save(student);
+        JSONObject studentJSON = new JSONObject(mapper.writeValueAsString(student));
+        studentJSON.put("id", student.getId().toHexString());
+        responseJson.put("saveStudentResponse", studentJSON);
 
         return responseJson.toString();
 
     }
+
+    public Student getById(ObjectId id, HttpServletResponse response) throws JSONException {
+        boolean exists = studentRepository.existsById(id);
+
+        if (!exists) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+        }
+        return studentRepository.findById(id);
+
+    }
+
 
     public String deleteById(ObjectId id, HttpServletResponse response) throws JSONException {
         JSONObject responseJson = new JSONObject();
@@ -69,7 +74,7 @@ public class StudentService {
         if (!exists) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            responseJson.put("deleted employee with id ", id);
+            responseJson.put("deleted student with id ", id);
             studentRepository.deleteById(id);
 
 
@@ -80,12 +85,11 @@ public class StudentService {
 
 
     @Transactional
-    public String updateEmployee(ObjectId id, Student employee, HttpServletResponse response) throws JsonProcessingException, JSONException {
+    public String updateStudent(ObjectId id, Student student, HttpServletResponse response) throws JsonProcessingException, JSONException {
         JSONObject responseJson = new JSONObject();
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         Student employee1 = studentRepository.findById(id);
-
 
         boolean exists = studentRepository.existsById(id);
 
@@ -93,20 +97,15 @@ public class StudentService {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
 
-        if(employee.getName()!=null) {
-            employee1.setName(employee.getName());
-            employee1.setAge(employee.getAge());
+        if(student.getName()!=null) {
+            employee1.setName(student.getName());
+            employee1.setAge(student.getAge());
             studentRepository.save(employee1);
-
-
 
             JSONObject studentJSON = new JSONObject(mapper.writeValueAsString(employee1));
             studentJSON.put("id", employee1.getId().toHexString());
-            responseJson.put("getUpdatedEmployeeResponse", studentJSON);
+            responseJson.put("getUpdatedStudentResponse", studentJSON);
         }
-
-
-
 
         return responseJson.toString();
 

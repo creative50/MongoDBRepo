@@ -22,22 +22,31 @@ public class StudentController {
     private final StudentService studentService;
 
 
+
+
     @Autowired
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
 
 
-    @CrossOrigin(origins = "*")
     @GetMapping(path = "/findAllStudents",produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Student> getAllStudents(HttpServletResponse response) {
-       return studentService.getAllEmployees();
+       return studentService.getAllStudents();
 
     }
 
+    @GetMapping(path = "/findAllStudents/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Student getStudent(@PathVariable ObjectId id, HttpServletResponse response){
+        for (Student obj :studentService.getAllStudents() ) {
+            if (obj.getId().equals(id))
+                return studentService.getById(id,response);
+        }
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        return null;
+    }
 
-
-
+    @CrossOrigin(origins = "*")
     @PostMapping(path="/add")
     public @ResponseBody
     String addStudent(@RequestBody Student student,HttpServletResponse response) throws JsonProcessingException {
@@ -55,7 +64,7 @@ public class StudentController {
     public String updateStudent(@PathVariable("id") ObjectId id,
                                 @RequestBody Student student, HttpServletResponse response) throws JsonProcessingException {
 
-        return studentService.updateEmployee(id, student, response);
+        return studentService.updateStudent(id, student, response);
     }
 
 
